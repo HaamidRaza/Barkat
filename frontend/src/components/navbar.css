@@ -1,0 +1,132 @@
+:root {
+          --primary: #7A2E2E;
+          --primary-light: #9B3D3D;
+          --primary-dark: #5E2222;
+          --primary-glow: rgba(122,46,46,0.15);
+          --accent: #D4A017;
+          --accent-light: #F0C040;
+          --accent-bg: rgba(212,160,23,0.10);
+          --secondary: #3F7D3A;
+          --brown: #5A3E2B;
+          --bg: #F6F1E7;
+          --bg-alt: #EDE4D2;
+          --bg-deep: #E4D8C4;
+          --card: #EDE6D6;
+          --text: #2A1A1A;
+          --text-muted: #8A7060;
+          --text-light: #B09A88;
+          --border: #D8C9B4;
+          --border-light: #E8DDD0;
+          --shadow-sm: 0 1px 4px rgba(90,62,43,0.08);
+          --shadow: 0 2px 16px rgba(90,62,43,0.11);
+          --shadow-md: 0 6px 32px rgba(90,62,43,0.15);
+          --shadow-lg: 0 16px 56px rgba(90,62,43,0.20);
+        }
+
+        .bk-nav {
+          font-family: 'Inter', sans-serif;
+          background: var(--bg);
+          position: sticky;
+          top: 0;
+          z-index: 200;
+          transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        .bk-nav.scrolled {
+          box-shadow: var(--shadow-md);
+          border-bottom: 1.5px solid var(--border);
+        }
+        .bk-nav:not(.scrolled) {
+          border-bottom: 1.5px solid var(--border-light);
+        }
+
+        /* Paper grain overlay */
+        .bk-nav::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+          pointer-events: none;
+          z-index: 0;
+        }
+        .bk-nav > * { position: relative; z-index: 1; }
+
+        /* ── MAIN ROW ── */
+        .bk-main {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 13px 28px;
+        }
+
+        /* ── LOGO ── */
+        .bk-logo {
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex-shrink: 0;
+          gap: 2px;
+        }
+        .bk-logo-text-wrap {
+          height: 30px;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+        }
+        .bk-logo-text {
+          font-family: 'Playfair Display', serif;
+          font-weight: 700;
+          color: var(--primary);
+          line-height: 1;
+          transition: opacity 0.3s ease, transform 0.3s ease;
+          display: block;
+          white-space: nowrap;
+        }
+        .bk-logo-text.latin { font-size: 28px; letter-spacing: -0.01em; }
+        .bk-logo-text.urdu { font-size: 26px; direction: rtl; }
+        .bk-logo-text.visible { opacity: 1; transform: translateY(0); }
+        .bk-logo-text.hidden { opacity: 0; transform: translateY(6px); }
+
+        .bk-logo-sub {
+          font-size: 8.5px;
+          color: var(--accent);
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          font-weight: 700;
+          opacity: 0.9;
+        }
+        .bk-logo-ornament {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .bk-logo-ornament::before,
+        .bk-logo-ornament::after {
+          content: '';
+          width: 14px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, var(--accent));
+        }
+        .bk-logo-ornament::after {
+          background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        /* ── LINKS ROW ── */
+        .bk-link {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 12px;
+          border-radius: 22px;
+          text-decoration: none;
+          font-size: 14.5px;
+          font-weight: 500;
+          color: var(--text-muted);
+          transition: all 0.2s;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .bk-link:hover, .bk-link.active {
+          background: var(--bg-alt);
+          color: var(--primary);
+        }
