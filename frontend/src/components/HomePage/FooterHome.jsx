@@ -1,87 +1,163 @@
-import React, { useState } from "react";
-import { Mail, Send, Leaf } from "lucide-react";
+import React from "react";
+import { Store, ChefHat, ArrowRight, Leaf, ShoppingBag } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
+import stall from "../../assets/stall.png";
+const PERKS = [
+  {
+    icon: <ShoppingBag size={16} />,
+    title: "Reach more buyers",
+    desc: "List your products in front of thousands of daily shoppers.",
+  },
+  {
+    icon: <ChefHat size={16} />,
+    title: "Share your recipes",
+    desc: "Publish community recipes and link them to your products.",
+  },
+  {
+    icon: <Leaf size={16} />,
+    title: "Grow your brand",
+    desc: "Build a trusted seller profile with ratings and reviews.",
+  },
+];
 
 const FooterCTA = () => {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const { user, isSeller, setShowUserLogin, navigate } = useAppContext();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubmitted(true);
-      setEmail("");
+  const handleCTA = () => {
+    if (!user) {
+      setShowUserLogin(true);
+    } else if (isSeller) {
+      navigate("/seller");
+    } else {
+      navigate("/seller/register");
     }
   };
 
   return (
-    <section>
-      <div className="mb-18 px-4 md:px-6 lg:px-14 xl:px-20 py-14 md:py-4 flex flex-col items-center text-center gap-2">
-        {/* Eyebrow */}
-        <div className="flex items-center gap-2">
-          <span className="w-5 h-px bg-primary-alt" />
-          <Leaf size={11} className="text-primary-alt" />
-          <span className="text-[10px] font-bold text-primary-alt uppercase tracking-widest font-['Inter']">
-            Stay Connected
-          </span>
-          <Leaf size={11} className="text-primary-alt" />
-          <span className="w-5 h-px bg-primary-alt" />
-        </div>
-
-        {/* Heading */}
-        <div className="flex flex-col gap-2">
-          <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2A1A1A] leading-tight">
-            Never Miss a <span className="text-primary italic">Deal</span>
-          </h2>
-        </div>
-
-        {/* Form */}
-        {submitted ? (
-          <div className="flex items-center gap-3 bg-[#EAF3DE] border border-[#3F7D3A]/25 rounded-2xl px-6 py-4 mt-2">
-            <div className="w-8 h-8 rounded-full bg-[#3F7D3A]/15 flex items-center justify-center shrink-0">
-              <Leaf size={14} className="text-[#3F7D3A]" />
-            </div>
-            <div className="text-left">
-              <p className="text-sm font-bold text-[#2A1A1A] font-['Inter']">
-                You're in the bazaar!
-              </p>
-              <p className="text-xs text-[#5A3E2B] font-['Inter']">
-                We'll send you the freshest updates soon.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row gap-2.5 w-full max-w-lg mt-2"
-          >
-            <div className="flex items-center gap-2.5 flex-1 bg-[#F6F1E7] border border-[#D8C9B4] hover:border-primary-alt focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all rounded-xl px-4 py-0.5">
-              <Mail size={14} className="text-[#9A8A7A] shrink-0" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                required
-                className="flex-1 bg-transparent outline-none text-sm text-[#2A1A1A] placeholder:text-[#B0A090] py-3 font-['Inter']"
-              />
-            </div>
-            <button
-              type="submit"
-              className="flex items-center justify-center gap-2 px-7 py-3 bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-[#F6F1E7] text-sm font-semibold rounded-xl font-['Inter'] shrink-0 shadow-sm"
+    <section className="px-4 md:px-6 lg:px-14 xl:px-20 py-14">
+      <div
+        className="rounded-3xl px-6 md:px-12 py-12 flex flex-col md:flex-row items-center justify-between gap-10"
+        style={{ background: "#F5EDD8" }}
+      >
+        {/* Left */}
+        <div className="flex-1 flex flex-col gap-5 text-center md:text-left">
+          <div className="flex items-center gap-2 justify-center md:justify-start">
+            <span className="w-5 h-px" style={{ background: "#C8920A" }} />
+            <Store size={11} style={{ color: "#C8920A" }} />
+            <span
+              className="text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: "#C8920A" }}
             >
-              <Send size={13} />
-              Subscribe
-            </button>
-          </form>
-        )}
+              Sell on Barkat
+            </span>
+          </div>
 
-        <p className="text-[11px] text-[#9A8A7A] font-['Inter'] mt-1">
-          By subscribing you agree to our privacy policy. Unsubscribe anytime.
-        </p>
-        <p className="text-sm md:text-base text-[#7A6A5A] font-['Inter'] max-w-md leading-relaxed">
-          Fresh deals, seasonal picks, and bazaar stories — delivered to your
-          inbox. No spam, ever.
-        </p>
+          <h2
+            className="text-3xl md:text-4xl font-bold leading-tight text-[#1E1008]"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            Turn your passion
+            <br />
+            <span style={{ color: "#8B3A2A" }}>into a business</span>
+          </h2>
+
+          <p
+            className="text-sm leading-relaxed max-w-md"
+            style={{ color: "#6B5140" }}
+          >
+            Join our growing community of local sellers. List your products,
+            share your recipes, and reach thousands of customers — all in one
+            place.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+            <button
+              onClick={handleCTA}
+              className="flex items-center justify-center cursor-pointer gap-2 px-7 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95"
+              style={{ background: "#8B3A2A", color: "#FFECD0" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#7A2E20")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "#8B3A2A")
+              }
+            >
+              <Store size={15} />
+              {!user
+                ? "Start selling — it's free"
+                : isSeller
+                  ? "Go to dashboard"
+                  : "Apply to become a seller"}
+              <ArrowRight size={14} />
+            </button>
+
+            {!isSeller && (
+              <Link
+                to="/recipes"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95"
+                style={{
+                  border: "1.5px solid #C8920A",
+                  color: "#8A6010",
+                  background: "transparent",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#C8920A18")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
+              >
+                <ChefHat size={14} /> Browse recipes
+              </Link>
+            )}
+          </div>
+
+          <p className="text-xs" style={{ color: "#9A8060" }}>
+            Free to join · Admin reviewed · No hidden fees
+          </p>
+        </div>
+
+        {/* Center Illustration */}
+        <div className="hidden md:flex items-end justify-center shrink-0 w-120 self-end">
+          <img
+            src={stall}
+            alt="Local seller at a market stall"
+            className="w-full object-contain"
+          />
+        </div>
+
+        {/* Right — perks */}
+        <div className="hidden md:flex flex-col gap-3 w-full md:w-72 shrink-0">
+          {PERKS.map((perk) => (
+            <div
+              key={perk.title}
+              className="flex items-start gap-3 rounded-2xl px-4 py-3"
+              style={{ background: "#FEFAF2", border: "1px solid #E0D2B4" }}
+            >
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                style={{ background: "#8B3A2A18", color: "#8B3A2A" }}
+              >
+                {perk.icon}
+              </div>
+              <div>
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "#1E1008" }}
+                >
+                  {perk.title}
+                </p>
+                <p
+                  className="text-xs mt-0.5 leading-relaxed"
+                  style={{ color: "#9A8060" }}
+                >
+                  {perk.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
