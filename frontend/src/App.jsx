@@ -38,7 +38,8 @@ import AllRecipes from "./components/Admin/AllRecipes";
 
 const App = () => {
   const isLoginPath =
-    useLocation().pathname.includes("seller/login")
+    useLocation().pathname.includes("seller/login") ||
+    useLocation().pathname.includes("seller/register");
   const { showUserLogin, isSeller } = useAppContext();
   return (
     <div>

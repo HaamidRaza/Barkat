@@ -18,6 +18,6 @@ export const RequireAdmin = ({ children }) => {
 export const RequireUser = ({ children }) => {
   const { user, authReady } = useAppContext();
   if (!authReady) return null;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   return children;
 };
