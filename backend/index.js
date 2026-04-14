@@ -16,10 +16,10 @@ import reviewRouter from "./routes/reviewRoute.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
-const allowedOrigins = [process.env.VITE_URL || "http://localhost:5173"];
+const allowedOrigins = process.env.VITE_URL;
 
 await connectDB();
-await connectCloudinary()
+await connectCloudinary();
 
 // Middlewares
 app.use(express.json());
@@ -34,7 +34,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.get("/", (req, res) => {
