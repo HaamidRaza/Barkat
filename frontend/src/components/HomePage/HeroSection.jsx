@@ -137,7 +137,7 @@ const HeroSection = () => {
             abundance.
           </p>
 
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col  gap-2.5">
             <Link
               to={"/products"}
               className="flex items-center justify-center gap-2 w-full py-3 cursor-pointer bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-background text-sm font-semibold rounded-xl shadow-sm font-['Inter']"
@@ -145,7 +145,7 @@ const HeroSection = () => {
               <ShoppingBasketIcon size={16} />
               <span>Shop Now</span>
             </Link>
-            <Link to={"/recipes"} className="w-full py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']">
+            <Link to={"/recipes"} className="flex items-center justify-center w-full py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']">
               Explore Recipes →
             </Link>
           </div>
