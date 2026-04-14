@@ -1,7 +1,13 @@
 import React from "react";
 import MainBanner from "../../assets/main_banner.png";
 import MainBannerSmall from "../../assets/main_banner_small.png";
-import { Heart, Leaf, ShoppingBasket, ShoppingBasketIcon, ShovelIcon } from "lucide-react";
+import {
+  Heart,
+  Leaf,
+  ShoppingBasket,
+  ShoppingBasketIcon,
+  ShovelIcon,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const HeroSection = () => {
@@ -26,7 +32,9 @@ const HeroSection = () => {
           <h1 className="font-['Playfair_Display'] text-4xl lg:text-5xl font-bold text-[#2A1A1A] leading-tight">
             Fresh from the Bazaar,
             <br />
-            <span className="text-primary flex items-baseline gap-2">Straight to You <Heart size={30} fill="#7A2E2E"/></span>
+            <span className="text-primary flex items-baseline gap-2">
+              Straight to You <Heart size={30} fill="#7A2E2E" />
+            </span>
           </h1>
 
           <p className="text-secondary-alt text-base leading-relaxed font-['Inter']">
@@ -35,11 +43,17 @@ const HeroSection = () => {
           </p>
 
           <div className="flex items-center gap-3 flex-wrap">
-            <Link to={"/products"} className="flex gap-1 items-center px-6 py-3 cursor-pointer bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-background text-sm font-semibold rounded-xl shadow-sm font-['Inter']">
-              <ShoppingBasketIcon size={16}/>
+            <Link
+              to={"/products"}
+              className="flex gap-1 items-center px-6 py-3 cursor-pointer bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-background text-sm font-semibold rounded-xl shadow-sm font-['Inter']"
+            >
+              <ShoppingBasketIcon size={16} />
               <span>Shop Now</span>
             </Link>
-            <Link to={"/recipes"} className="px-6 py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']">
+            <Link
+              to={"/recipes"}
+              className="px-6 py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']"
+            >
               Explore Recipes →
             </Link>
           </div>
@@ -124,12 +138,16 @@ const HeroSection = () => {
           </p>
 
           <div className="flex flex-col gap-2.5">
-            <button className="w-full py-3 cursor-pointer bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-background text-sm font-semibold rounded-xl shadow-sm font-['Inter']">
-              Add to Basket
-            </button>
-            <button className="w-full py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']">
-              Explore Barkat Deals →
-            </button>
+            <Link
+              to={"/products"}
+              className="flex items-center justify-center gap-2 w-full py-3 cursor-pointer bg-primary hover:bg-[#9B3D3D] active:scale-95 transition-all text-background text-sm font-semibold rounded-xl shadow-sm font-['Inter']"
+            >
+              <ShoppingBasketIcon size={16} />
+              <span>Shop Now</span>
+            </Link>
+            <Link to={"/recipes"} className="w-full py-3 cursor-pointer border border-primary-alt text-[#8A6010] hover:bg-primary-alt/10 active:scale-95 transition-all text-sm font-semibold rounded-xl font-['Inter']">
+              Explore Recipes →
+            </Link>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
