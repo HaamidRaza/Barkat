@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 
 const AdminLayout = () => {
-  const { logoutAdmin } = useAppContext();
   const location = useLocation();
 
   const sidebarLinks = [
@@ -39,10 +38,6 @@ const AdminLayout = () => {
       icon: <BookOpen size={20} strokeWidth={1.8} />,
     },
   ];
-
-  const logout = async () => {
-    await logoutAdmin();
-  };
 
   const isLinkActive = (path) => location.pathname === path;
 

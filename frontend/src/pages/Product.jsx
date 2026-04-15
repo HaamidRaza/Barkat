@@ -104,9 +104,8 @@ const Product = () => {
   const product = products.find(
     (p) => String(p.id) === id || String(p._id) === id,
   );
-  const isOwner =
-    user?._id === product?.submittedBy?._id ||
-    user?.id === product?.submittedBy?._id;
+
+  const isOwner = user?._id === product?.seller || user?.id === product?.seller;
 
   useEffect(() => {
     if (products.length > 0 && product) {

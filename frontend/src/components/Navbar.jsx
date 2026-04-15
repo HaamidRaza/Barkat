@@ -31,6 +31,7 @@ const Navbar = () => {
   const {
     user,
     logout,
+    logoutAdmin,
     setShowUserLogin,
     navigate,
     searchQuery,
@@ -276,8 +277,9 @@ const Navbar = () => {
                     </div>
                   )}
                   <div
-                    onClick={() => {
-                      logout();
+                    onClick={async () => {
+                      if (isAdmin) await logoutAdmin();
+                      else await logout();
                       closeAll();
                       toast.success("Logged Out!");
                     }}
@@ -443,7 +445,7 @@ const Navbar = () => {
                               navigate("seller");
                               closeAll();
                             }}
-                            className="flex items-center gap-3 px-4 py-1.5 text-sm text-secondary-alt hover:bg-background-alt hover:text-primary cursor-pointer transition-colors border rounded-xl border-background-alt"
+                            className="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-background-alt hover:bg-background-alt text-sm font-medium text-secondary-alt transition-all"
                           >
                             <Wallpaper size={14} />
                             Dashboard
@@ -459,7 +461,7 @@ const Navbar = () => {
                               navigate("admin");
                               closeAll();
                             }}
-                            className="flex items-center gap-2 px-4 py-1.5 text-sm text-secondary-alt hover:bg-background-alt hover:text-primary cursor-pointer transition-colors border rounded-xl border-background-alt"
+                            className="flex items-center gap-2 px-4 py-1.5 rounded-xl border border-background-alt hover:bg-background-alt text-sm font-medium text-secondary-alt transition-all"
                           >
                             <Contact size={14} />
                             Admin
@@ -469,17 +471,18 @@ const Navbar = () => {
                             />
                           </div>
                         )}
-                        <button
-                          onClick={() => {
-                            logout();
+                        <div
+                          onClick={async () => {
+                            if (isAdmin) await logoutAdmin();
+                            else await logout();
                             closeAll();
                             toast.success("Logged Out!");
                           }}
-                          className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-xl border border-red-200 text-red-700 hover:bg-red-50 text-sm font-medium transition-all active:scale-95"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-red-700 hover:bg-red-50 cursor-pointer transition-colors"
                         >
                           <LogOut size={14} />
                           Log Out
-                        </button>
+                        </div>
                       </>
                     )}
                   </div>

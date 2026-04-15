@@ -26,13 +26,12 @@ export const addProducts = async (req, res) => {
   }
 };
 
-// get products
-export const productList = async (req, res) => {
+// get all products (public — for storefront)
+export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({ inStock: true });
     res.json({ success: true, products });
   } catch (e) {
-    console.log(e.message);
     res.json({ success: false, message: e.message });
   }
 };
@@ -49,12 +48,33 @@ export const productById = async (req, res) => {
   }
 };
 
-// update product
+// get products — only seller's own
+export const productList = async (req, res) => {
+  try {
+    const products = await Product.find({ seller: req.seller.id });
+    res.json({ success: true, products });
+  } catch (e) {
+    res.json({ success: false, message: e.message });
+  }
+};
+
+// update product — verify ownership
 export const updateProduct = async (req, res) => {
   try {
     const { id, name, description, category, price, offerPrice } = req.body;
+    const product = await Product.findOne({ _id: id, seller: req.seller.id });
+    if (!product)
+      return res.json({
+        success: false,
+        message: "Product not found or unauthorized",
+      });
+
     await Product.findByIdAndUpdate(id, {
-      name, description, category, price, offerPrice,
+      name,
+      description,
+      category,
+      price,
+      offerPrice,
     });
     res.json({ success: true, message: "Product updated!" });
   } catch (e) {
@@ -62,31 +82,40 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// change product stock
+// change stock — verify ownership
 export const changeStock = async (req, res) => {
   try {
     const { id, inStock } = req.body;
+    const product = await Product.findOne({ _id: id, seller: req.seller.id });
+    if (!product)
+      return res.json({
+        success: false,
+        message: "Product not found or unauthorized",
+      });
+
     await Product.findByIdAndUpdate(id, { inStock });
     res.json({ success: true, message: "Stock Updated!" });
   } catch (e) {
-    console.log(e.message);
     res.json({ success: false, message: e.message });
   }
 };
 
-// delete Product
+// delete product — verify ownership
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.body;
-    const product = await Product.findById(id);
-    if (!product) return res.json({ success: false, message: "Product not found" });
+    const product = await Product.findOne({ _id: id, seller: req.seller.id });
+    if (!product)
+      return res.json({
+        success: false,
+        message: "Product not found or unauthorized",
+      });
 
-    // Delete images from cloudinary
     await Promise.all(
       product.image.map((url) => {
         const publicId = url.split("/").pop().split(".")[0];
         return cloudinary.uploader.destroy(publicId);
-      })
+      }),
     );
 
     await Product.findByIdAndDelete(id);

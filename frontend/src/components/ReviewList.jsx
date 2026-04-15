@@ -30,7 +30,6 @@ const ReviewList = ({
       axios
         .get(`/review/${targetType}/${targetId}`)
         .then(({ data }) => {
-        
           if (data.success) {
             setReviews(data.reviews);
             setSummary(data.summary);
@@ -54,12 +53,11 @@ const ReviewList = ({
       );
     }
   };
-  console.log(reviews);
-
+  
   const handleOwnerDelete = async (reviewId) => {
     if (!window.confirm("Delete this review?")) return;
     const { data } = await axios.delete(`/review/owner/${reviewId}`, {
-      data: { recipeId: targetId },
+      data: { productId: targetId }, // was: recipeId
     });
     if (data.success) {
       setReviews((prev) => prev.filter((r) => r._id !== reviewId));
@@ -263,7 +261,7 @@ const ReviewList = ({
                 {isOwner && (
                   <button
                     onClick={() => handleOwnerDelete(r._id)}
-                    className="p-1 rounded-lg transition-colors"
+                    className="p-1 cursor-pointer rounded-lg transition-colors"
                     style={{ color: "#E53935" }}
                     title="Remove this review"
                   >

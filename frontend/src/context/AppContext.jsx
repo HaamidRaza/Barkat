@@ -49,7 +49,9 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/admin/is-auth", {
         withCredentials: true,
       });
+      console.log("admin auth check:", data);
       if (data.success) setIsAdmin(true);
+      else setIsAdmin(false); // ← explicitly set false on failure
     } catch {
       setIsAdmin(false);
     }
@@ -69,7 +71,7 @@ export const AppContextProvider = ({ children }) => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("/product/list");
+      const { data } = await axios.get("/product/all");
       if (data.success) {
         setProducts(data.products.map((p) => ({ ...p, id: p._id })));
       } else {
@@ -252,9 +254,9 @@ export const AppContextProvider = ({ children }) => {
 
   const logout = async () => {
     await axios.get("/user/logout", { withCredentials: true });
-    setUser(null);
-    setIsSeller(false);
     setIsAdmin(false);
+    setIsSeller(false);
+    setUser(null);
     navigate("/");
   };
 

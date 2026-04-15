@@ -11,10 +11,13 @@ const razorpay = new Razorpay({
 // Place Order COD
 export const placeOrderCOD = async (req, res) => {
   try {
-    const { userId, items, address, amount } = req.body;
+    const { items, address, amount } = req.body;
+    const userId = req.user.id;
+
     if (!address || items.length === 0) {
       return res.json({ success: false, message: "Invalid data" });
     }
+
     await Order.create({
       userId,
       items,
@@ -22,6 +25,7 @@ export const placeOrderCOD = async (req, res) => {
       address,
       paymentType: "COD",
     });
+
     return res.json({ success: true, message: "Order Placed!" });
   } catch (e) {
     console.log(e.message);
@@ -52,7 +56,9 @@ export const getAllOrders = async (req, res) => {
     const sellerId = req.seller.id;
 
     // Get all product IDs belonging to this seller
-    const sellerProducts = await Product.find({ seller: sellerId }).select("_id");
+    const sellerProducts = await Product.find({ seller: sellerId }).select(
+      "_id",
+    );
     const sellerProductIds = sellerProducts.map((p) => p._id.toString());
 
     // Get orders that contain at least one seller product
@@ -68,7 +74,7 @@ export const getAllOrders = async (req, res) => {
     const filtered = orders.map((order) => ({
       ...order.toObject(),
       items: order.items.filter((item) =>
-        sellerProductIds.includes(item.product?._id?.toString())
+        sellerProductIds.includes(item.product?._id?.toString()),
       ),
     }));
 
@@ -126,7 +132,6 @@ export const verifyPayment = async (req, res) => {
       orderData,
     } = req.body;
 
-    // Verify signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -134,12 +139,15 @@ export const verifyPayment = async (req, res) => {
       .digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
-      return res.json({ success: false, message: "Payment verification failed" });
+      return res.json({
+        success: false,
+        message: "Payment verification failed",
+      });
     }
 
-    // Create order in DB
     await Order.create({
       ...orderData,
+      userId: req.user.id,
       paymentType: "Online",
       isPaid: true,
     });
