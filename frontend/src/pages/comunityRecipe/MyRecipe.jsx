@@ -70,7 +70,7 @@ const MyRecipes = () => {
 
   return (
     <div
-      className="max-w-3xl mx-auto px-4 py-10"
+      className="max-w-6xl mx-auto px-4 py-10 min-h-screen"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');`}</style>
@@ -92,7 +92,7 @@ const MyRecipes = () => {
       </div>
 
       {recipes.length === 0 ? (
-        <div className="flex flex-col items-center py-20 gap-3 text-center">
+        <div className="flex flex-col items-center py-20 pt-50 gap-3 text-center">
           <HandPlatter size={32} style={{ color: "#C8B89A" }} />
           <p className="font-semibold" style={{ color: "#6B5140" }}>
             No recipes yet
@@ -102,7 +102,7 @@ const MyRecipes = () => {
           </p>
           <button
             onClick={() => navigate("/submit-recipe")}
-            className="mt-2 px-5 py-2 rounded-xl text-sm font-semibold"
+            className="mt-2 px-5 py-2 cursor-pointer rounded-xl text-sm font-semibold"
             style={{ background: "#8B3A2A", color: "#FFECD0" }}
           >
             Submit a recipe
