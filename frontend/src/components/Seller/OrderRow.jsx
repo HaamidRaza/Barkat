@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import OrderDetail from "../OrderDetail";
 
 const STATUS_CONFIG = {
@@ -74,16 +74,27 @@ const OrderRow = ({
     const newStatus = e.target.value;
     setUpdatingStatus(true);
     try {
-      const { data } = await axios.patch("/order/status", {
-        orderId: order._id,
-        status: newStatus,
-      });
-      if (data.success) {
-        toast.success("Status updated");
-        onStatusChange(order._id, newStatus);
-      } else toast.error(data.message);
-    } catch (err) {
-      toast.error(err.message);
+      await toast.promise(
+        axios.patch("/order/status", {
+          orderId: order._id,
+          status: newStatus,
+        }),
+        {
+          loading: "Updating status...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              onStatusChange(order._id, newStatus);
+              return "Status updated";
+            } else {
+              throw new Error(data.message || "Failed to update status");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to update status";
+          },
+        }
+      );
     } finally {
       setUpdatingStatus(false);
     }
@@ -92,16 +103,27 @@ const OrderRow = ({
   const handlePaymentToggle = async () => {
     setUpdatingPay(true);
     try {
-      const { data } = await axios.patch("/order/payment-status", {
-        orderId: order._id,
-        isPaid: !order.isPaid,
-      });
-      if (data.success) {
-        toast.success("Payment status updated");
-        onPaymentChange(order._id, !order.isPaid);
-      } else toast.error(data.message);
-    } catch (err) {
-      toast.error(err.message);
+      await toast.promise(
+        axios.patch("/order/payment-status", {
+          orderId: order._id,
+          isPaid: !order.isPaid,
+        }),
+        {
+          loading: "Updating payment status...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              onPaymentChange(order._id, !order.isPaid);
+              return "Payment status updated";
+            } else {
+              throw new Error(data.message || "Failed to update payment");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to update payment";
+          },
+        }
+      );
     } finally {
       setUpdatingPay(false);
     }

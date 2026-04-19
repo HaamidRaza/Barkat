@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import StarRating from "./StarRating";
 import { ThumbsUp, ThumbsDown, Pencil, Trash2 } from "lucide-react";
 
@@ -40,23 +40,32 @@ const ReviewForm = ({ targetType, targetId, onSubmitted }) => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post("/review/submit", {
-        targetType,
-        targetId,
-        rating,
-        vote,
-        comment,
-      });
-      if (data.success) {
-        toast.success(existing ? "Review updated!" : "Review submitted!");
-        setExisting(data.review);
-        setEditing(false);
-        setTimeout(() => onSubmitted?.(), 0);
-      } else {
-        toast.error(data.message);
-      }
-    } catch {
-      toast.error("Something went wrong");
+      await toast.promise(
+        axios.post("/review/submit", {
+          targetType,
+          targetId,
+          rating,
+          vote,
+          comment,
+        }),
+        {
+          loading: "Submitting review...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setExisting(data.review);
+              setEditing(false);
+              setTimeout(() => onSubmitted?.(), 0);
+              return existing ? "Review updated!" : "Review submitted!";
+            } else {
+              throw new Error(data.message || "Failed to submit review");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Something went wrong";
+          },
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -64,15 +73,32 @@ const ReviewForm = ({ targetType, targetId, onSubmitted }) => {
 
   const handleDelete = async () => {
     if (!window.confirm("Delete your review?")) return;
-    const { data } = await axios.delete(`/review/${existing._id}`);
-    if (data.success) {
-      toast.success("Review deleted");
-      setRating(0);
-      setVote(null);
-      setComment("");
-      setExisting(null);
-      setEditing(false);
-      setTimeout(() => onSubmitted?.(), 0);
+    try {
+      await toast.promise(
+        axios.delete(`/review/${existing._id}`),
+        {
+          loading: "Deleting review...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setRating(0);
+              setVote(null);
+              setComment("");
+              setExisting(null);
+              setEditing(false);
+              setTimeout(() => onSubmitted?.(), 0);
+              return "Review deleted";
+            } else {
+              throw new Error(data.message || "Failed to delete review");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to delete";
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
 

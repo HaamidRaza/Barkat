@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import axios from "../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   ShoppingBasket,
   Plus,
@@ -78,26 +78,44 @@ const Basket = () => {
   const total = subtotal + shipping + tax;
 
   const placeOrder = async () => {
-    try {
-      if (!selectedAddress) return toast.error("Please select an address.");
+    if (!selectedAddress) return toast.error("Please select an address.");
 
-      if (paymentOption === "COD") {
-        const { data } = await axios.post("/order/cod", {
-          userId: user._id,
-          items: cartArray.map((i) => ({ product: i._id, quantity: i.qty })),
-          address: selectedAddress._id,
-          amount: total,
-        });
-        if (data.success) {
-          toast.success(data.message);
-          setCartItems({});
-          navigate("/orders");
-        } else {
-          toast.error(data.message);
-        }
+    if (paymentOption === "COD") {
+      const orderPromise = axios.post("/order/cod", {
+        userId: user._id,
+        items: cartArray.map((i) => ({ product: i._id, quantity: i.qty })),
+        address: selectedAddress._id,
+        amount: total,
+      });
+
+      try {
+        await toast.promise(
+          orderPromise,
+          {
+            loading: "Processing order...",
+            success: (response) => {
+              const { data } = response;
+              if (data.success) {
+                setCartItems({});
+                setTimeout(() => navigate("/orders"), 500);
+                return data.message || "Order placed successfully!";
+              } else {
+                throw new Error(data.message || "Order failed");
+              }
+            },
+            error: (err) => {
+              return err.response?.data?.message || err.message || "Failed to place order";
+            },
+          }
+        );
+      } catch (error) {
+        console.error(error);
       }
+      return;
+    }
 
-      if (paymentOption === "Online") {
+    if (paymentOption === "Online") {
+      try {
         // Step 1: create Razorpay order
         const { data } = await axios.post("/order/razorpay", { amount: total });
         if (!data.success) return toast.error(data.message);
@@ -112,7 +130,7 @@ const Basket = () => {
           order_id: data.order.id,
           handler: async (response) => {
             // Step 3: verify payment
-            const { data: verifyData } = await axios.post("/order/verify", {
+            const verifyPromise = axios.post("/order/verify", {
               ...response,
               orderData: {
                 userId: user._id,
@@ -124,12 +142,29 @@ const Basket = () => {
                 amount: total,
               },
             });
-            if (verifyData.success) {
-              toast.success(verifyData.message);
-              setCartItems({});
-              navigate("/orders");
-            } else {
-              toast.error(verifyData.message);
+
+            try {
+              await toast.promise(
+                verifyPromise,
+                {
+                  loading: "Verifying payment...",
+                  success: (verifyResponse) => {
+                    const { data: verifyData } = verifyResponse;
+                    if (verifyData.success) {
+                      setCartItems({});
+                      setTimeout(() => navigate("/orders"), 500);
+                      return verifyData.message || "Payment successful!";
+                    } else {
+                      throw new Error(verifyData.message || "Payment verification failed");
+                    }
+                  },
+                  error: (err) => {
+                    return err.response?.data?.message || err.message || "Payment verification failed";
+                  },
+                }
+              );
+            } catch (error) {
+              console.error(error);
             }
           },
           prefill: {
@@ -141,9 +176,9 @@ const Basket = () => {
 
         const rzp = new window.Razorpay(options);
         rzp.open();
+      } catch (e) {
+        toast.error(e.message);
       }
-    } catch (e) {
-      toast.error(e.message);
     }
   };
 

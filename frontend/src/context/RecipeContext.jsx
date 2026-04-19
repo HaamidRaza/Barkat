@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 export const RecipeContext = createContext(null);
 
@@ -89,7 +89,8 @@ export const RecipeProvider = ({ children }) => {
   const searchRecipes = async (query) => {
     if (!query.trim()) return;
     setLoading(true);
-    try {
+
+    const performSearch = async () => {
       let results = [];
       if (activeSource === "forkify") {
         results = await searchForkify(query);
@@ -107,10 +108,24 @@ export const RecipeProvider = ({ children }) => {
         const deduped = mealdb.filter((r) => !seen.has(r.title.toLowerCase()));
         results = [...forkify, ...deduped];
       }
-      setRecipeList(results);
-    } catch {
-      setRecipeList([]);
-      toast.error("Failed to fetch recipes");
+      if (!results || results.length === 0) {
+        throw new Error("No recipes found");
+      }
+      return results;
+    };
+
+    try {
+      await toast.promise(
+        performSearch(),
+        {
+          loading: "Searching recipes...",
+          success: (results) => {
+            setRecipeList(results);
+            return `Found ${results.length} recipe${results.length !== 1 ? "s" : ""}!`;
+          },
+          error: "Failed to fetch recipes",
+        }
+      );
     } finally {
       setLoading(false);
     }

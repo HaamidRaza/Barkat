@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import axios from "../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);

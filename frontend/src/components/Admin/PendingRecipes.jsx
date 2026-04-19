@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { ChefHat, Clock, CheckCircle, XCircle, X } from "lucide-react";
 
 const PendingRecipes = () => {

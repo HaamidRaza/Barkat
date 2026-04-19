@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext.jsx";
 import {
   HandPlatter,
@@ -44,14 +44,27 @@ const MyRecipes = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this recipe?")) return;
-    const { data } = await axios.delete(`/recipe/${id}`, {
-      withCredentials: true,
-    });
-    if (data.success) {
-      toast.success("Recipe deleted");
-      setRecipes((prev) => prev.filter((r) => r._id !== id));
-    } else {
-      toast.error(data.message);
+    try {
+      await toast.promise(
+        axios.delete(`/recipe/${id}`, { withCredentials: true }),
+        {
+          loading: "Deleting recipe...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setRecipes((prev) => prev.filter((r) => r._id !== id));
+              return "Recipe deleted";
+            } else {
+              throw new Error(data.message || "Failed to delete recipe");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to delete";
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
 

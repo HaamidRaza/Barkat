@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import axios from "../../config/api.js";
 
 const SubmitRecipe = () => {
@@ -162,35 +162,44 @@ const SubmitRecipe = () => {
       return toast.error("Complete all ingredient fields");
     if (steps.some((s) => !s.instruction))
       return toast.error("Complete all step fields");
+    if (videoUrl && !validateYouTube(videoUrl))
+      return toast.error("Invalid YouTube URL");
 
     setLoading(true);
+
+    const fd = new FormData();
+    fd.append("title", form.title);
+    fd.append("description", form.description);
+    fd.append("prepTime", form.prepTime);
+    fd.append("cookTime", form.cookTime);
+    fd.append(
+      "linkedProducts",
+      JSON.stringify(linkedProducts.map((p) => p._id)),
+    );
+    fd.append("ingredients", JSON.stringify(ingredients));
+    fd.append("steps", JSON.stringify(steps));
+    fd.append("videoUrl", videoUrl);
+    if (photo) fd.append("photo", photo);
+
     try {
-      const fd = new FormData();
-      fd.append("title", form.title);
-      fd.append("description", form.description);
-      fd.append("prepTime", form.prepTime);
-      fd.append("cookTime", form.cookTime);
-      fd.append(
-        "linkedProducts",
-        JSON.stringify(linkedProducts.map((p) => p._id)),
+      await toast.promise(
+        axios.post(`/recipe/submit`, fd, { withCredentials: true }),
+        {
+          loading: "Submitting recipe...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setTimeout(() => navigate("/my-recipes"), 500);
+              return "Recipe submitted! It will go live after review.";
+            } else {
+              throw new Error(data.message || "Submission failed");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Submission failed";
+          },
+        }
       );
-      fd.append("ingredients", JSON.stringify(ingredients));
-      fd.append("steps", JSON.stringify(steps));
-      fd.append("videoUrl", videoUrl);
-      if (photo) fd.append("photo", photo);
-      if (videoUrl && !validateYouTube(videoUrl))
-        return toast.error("Invalid YouTube URL");
-      const { data } = await axios.post(`/recipe/submit`, fd, {
-        withCredentials: true,
-      });
-      if (data.success) {
-        toast.success("Recipe submitted! It will go live after review.");
-        navigate("/my-recipes");
-      } else {
-        toast.error(data.message);
-      }
-    } catch {
-      toast.error("Submission failed");
     } finally {
       setLoading(false);
     }

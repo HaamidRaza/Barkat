@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { Trash2, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useAppContext } from "../../context/AppContext.jsx";
 

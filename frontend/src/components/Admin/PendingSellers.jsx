@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { Store, CheckCircle, XCircle, Mail, User } from "lucide-react";
 
 const PendingSellers = () => {
@@ -14,14 +14,29 @@ const PendingSellers = () => {
   };
 
   const handle = async (userId, action) => {
-    const { data } = await axios.patch(
-      `/admin/sellers/${userId}/${action}`, {}, { withCredentials: true }
-    );
-    if (data.success) {
-      toast.success(data.message);
-      setSellers((prev) => prev.filter((s) => s._id !== userId));
-    } else {
-      toast.error(data.message);
+    try {
+      await toast.promise(
+        axios.patch(
+          `/admin/sellers/${userId}/${action}`, {}, { withCredentials: true }
+        ),
+        {
+          loading: action === "approve" ? "Approving seller..." : "Rejecting seller...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setSellers((prev) => prev.filter((s) => s._id !== userId));
+              return data.message || (action === "approve" ? "Seller approved!" : "Seller rejected");
+            } else {
+              throw new Error(data.message || "Action failed");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Action failed";
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
 

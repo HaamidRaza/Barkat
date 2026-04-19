@@ -3,7 +3,7 @@ import { useLocation, NavLink, Outlet } from "react-router-dom";
 import { LayoutDashboard, Package, ClipboardList, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const SellerLayout = () => {
   const { setIsSeller, navigate, seller } = useAppContext();

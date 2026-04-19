@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { AppContext } from "../../context/AppContext.jsx";
 import ReviewForm from "../../components/ReviewForm";
 import ReviewList from "../../components/ReviewList";

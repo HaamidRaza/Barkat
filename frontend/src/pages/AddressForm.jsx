@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import axios from "../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 /* ── validators ─────────────────────────────────────────── */
 const validators = {
@@ -220,15 +220,26 @@ const AddressForm = () => {
     if (hasErrors) return;
 
     try {
-      const { data } = await axios.post("/address/add", { address: formData });
-      if (data.success) {
-        toast.success("Address saved!");
-        navigate("/basket");
-      } else {
-        toast.error(data.message);
-      }
-    } catch (e) {
-      toast.error(e.message);
+      await toast.promise(
+        axios.post("/address/add", { address: formData }),
+        {
+          loading: "Saving address...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setTimeout(() => navigate("/basket"), 500);
+              return data.message || "Address saved!";
+            } else {
+              throw new Error(data.message || "Failed to save address");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to save address";
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
 

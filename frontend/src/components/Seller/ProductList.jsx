@@ -16,7 +16,7 @@ import {
   ImagePlus,
 } from "lucide-react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 /* ── Edit Modal ─────────────────────────────────────────────────────────── */
 const EditModal = ({ product, onClose, onSave }) => {

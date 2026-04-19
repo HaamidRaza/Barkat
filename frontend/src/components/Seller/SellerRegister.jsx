@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import axios from "../../config/api.js"
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   Store,
   Mail,
@@ -79,7 +79,8 @@ const SellerRegister = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
+
+    const submitRegistration = async () => {
       const { data: regData } = await axios.post(
         "/user/register",
         {
@@ -91,8 +92,7 @@ const SellerRegister = () => {
       );
 
       if (!regData.success) {
-        toast.error(regData.message);
-        return;
+        throw new Error(regData.message || "Registration failed");
       }
 
       const { data: sellerData } = await axios.post(
@@ -110,14 +110,27 @@ const SellerRegister = () => {
         { withCredentials: true },
       );
 
-      if (sellerData.success) {
-        toast.success("Application submitted! Await admin approval.");
-        navigate("/seller/login");
-      } else {
-        toast.error(sellerData.message);
+      if (!sellerData.success) {
+        throw new Error(sellerData.message || "Seller registration failed");
       }
-    } catch {
-      toast.error("Something went wrong");
+
+      return sellerData;
+    };
+
+    try {
+      await toast.promise(
+        submitRegistration(),
+        {
+          loading: "Creating seller account...",
+          success: () => {
+            setTimeout(() => navigate("/seller/login"), 500);
+            return "Application submitted! Await admin approval.";
+          },
+          error: (err) => {
+            return err.message || "Something went wrong";
+          },
+        }
+      );
     } finally {
       setIsLoading(false);
     }

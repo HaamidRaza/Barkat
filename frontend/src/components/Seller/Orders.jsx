@@ -10,7 +10,7 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import OrderRow from "./OrderRow.jsx";
 
 const STATUS_CONFIG = {

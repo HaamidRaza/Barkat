@@ -15,7 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import axios from "../../config/api.js"
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const SellerLogin = () => {
   const { isSeller, setIsSeller, navigate } = useAppContext();
@@ -28,19 +28,29 @@ const SellerLogin = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const { data } = await axios.post(
-        "/seller/login",
-        { email, password },
-        { withCredentials: true },
+      await toast.promise(
+        axios.post(
+          "/seller/login",
+          { email, password },
+          { withCredentials: true },
+        ),
+        {
+          loading: "Signing in...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setIsSeller(true);
+              setTimeout(() => navigate("/seller"), 500);
+              return "Welcome to your seller dashboard!";
+            } else {
+              throw new Error(data.message || "Login failed");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Login failed";
+          },
+        }
       );
-      if (data.success) {
-        setIsSeller(true);
-        navigate("/seller");
-      } else {
-        toast.error(data.message);
-      }
-    } catch {
-      toast.error("Login failed");
     } finally {
       setIsLoading(false);
     }

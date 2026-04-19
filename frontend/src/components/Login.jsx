@@ -2,7 +2,7 @@ import React from "react";
 import { User, Mail, Lock, Leaf, X } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import axios from "../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const { setShowUserLogin, setUser, loginAsAdmin, navigate } = useAppContext();
@@ -16,37 +16,45 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const endpoint = state === "login" ? "/user/login" : "/user/register";
+    const payload =
+      state === "login"
+        ? { email: formData.email, password: formData.password }
+        : {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          };
+
     try {
-      const endpoint = state === "login" ? "/user/login" : "/user/register";
-      const payload =
-        state === "login"
-          ? { email: formData.email, password: formData.password }
-          : {
-              name: formData.name,
-              email: formData.email,
-              password: formData.password,
-            };
-
-      const { data } = await axios.post(endpoint, payload);
-
-      if (data.success) {
-        if (data.isAdmin) {
-          loginAsAdmin(data.user);
-          setShowUserLogin(false);
-          navigate("/admin");
-          toast.success("Welcome back, Admin!");
-        } else {
-          setUser(data.user);
-          setShowUserLogin(false);
-          toast.success(
-            state === "login" ? "Welcome back!" : "Account created!",
-          );
+      await toast.promise(
+        axios.post(endpoint, payload),
+        {
+          loading: state === "login" ? "Signing in..." : "Creating account...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              if (data.isAdmin) {
+                loginAsAdmin(data.user);
+                setShowUserLogin(false);
+                navigate("/admin");
+                return "Welcome back, Admin!";
+              } else {
+                setUser(data.user);
+                setShowUserLogin(false);
+                return state === "login" ? "Welcome back!" : "Account created!";
+              }
+            } else {
+              throw new Error(data.message || "Authentication failed");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Something went wrong";
+          },
         }
-      } else {
-        toast.error(data.message);
-      }
-    } catch {
-      toast.error("Something went wrong");
+      );
+    } catch (error) {
+      console.error(error);
     }
   };
   

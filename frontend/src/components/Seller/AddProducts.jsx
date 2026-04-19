@@ -13,7 +13,7 @@ import {
   IndianRupee,
 } from "lucide-react";
 import axios from "../../config/api.js";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { sellerCategories } from "../../assets/assets.js";
 
 const AddProducts = () => {
@@ -56,38 +56,49 @@ const AddProducts = () => {
     setFiles((prev) => prev.filter((_, i) => i !== idx));
 
   const onSubmit = async (e) => {
+    e.preventDefault();
     setIsSubmitting(true);
-    try {
-      e.preventDefault();
-      const productData = {
-        name,
-        description: descRows
-          .filter((r) => r.label.trim() && r.value.trim())
-          .flatMap((r) => [r.label.trim(), r.value.trim(), ""]),
-        category,
-        price,
-        offerPrice,
-      };
+    
+    const productData = {
+      name,
+      description: descRows
+        .filter((r) => r.label.trim() && r.value.trim())
+        .flatMap((r) => [r.label.trim(), r.value.trim(), ""]),
+      category,
+      price,
+      offerPrice,
+    };
 
-      const formData = new FormData();
-      formData.append("productData", JSON.stringify(productData));
-      for (let i = 0; i < files.length; i++) {
-        formData.append("images", files[i].file);
-      }
-      const { data } = await axios.post("/product/add", formData);
-      if (data.success) {
-        toast.success(data.message);
-        setName("");
-        setDescRows([{ label: "", value: "" }]);
-        setCategory("");
-        setPrice("");
-        setOfferPrice("");
-        setFiles([]);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (e) {
-      toast.error(e.message);
+    const formData = new FormData();
+    formData.append("productData", JSON.stringify(productData));
+    for (let i = 0; i < files.length; i++) {
+      formData.append("images", files[i].file);
+    }
+
+    try {
+      await toast.promise(
+        axios.post("/product/add", formData),
+        {
+          loading: "Uploading product...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setName("");
+              setDescRows([{ label: "", value: "" }]);
+              setCategory("");
+              setPrice("");
+              setOfferPrice("");
+              setFiles([]);
+              return data.message || "Product added successfully!";
+            } else {
+              throw new Error(data.message || "Failed to add product");
+            }
+          },
+          error: (err) => {
+            return err.response?.data?.message || err.message || "Failed to upload product";
+          },
+        }
+      );
     } finally {
       setIsSubmitting(false);
     }

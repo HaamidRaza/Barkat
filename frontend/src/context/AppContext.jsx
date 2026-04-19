@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import axios from "../config/api.js";
 
 export const AppContext = createContext();

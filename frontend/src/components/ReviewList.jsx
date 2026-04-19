@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "../config/api.js";
 import { ThumbsUp, ThumbsDown, Trash2, CornerDownRight, X } from "lucide-react";
 import StarRating from "./StarRating";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const timeAgo = (date) => {
   const diff = Math.floor((Date.now() - new Date(date)) / 1000);
