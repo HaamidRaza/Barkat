@@ -69,6 +69,22 @@ const ProductCard = ({ item }) => {
   const dotColor = BADGE_DOT[item.tag] || BADGE_DOT["Fresh Today"];
   const badgeBg = BADGE_BG[item.tag] || BADGE_BG["Fresh Today"];
 
+  // item.description arrives as flattened [label, value, "", label, value, "", ...]
+  // groups split on the empty-string separators into { label, value } pairs
+  const specs = [];
+  if (Array.isArray(item.description)) {
+    let pair = [];
+    for (const part of item.description) {
+      if (part === "") {
+        if (pair.length >= 2) specs.push({ label: pair[0], value: pair[1] });
+        pair = [];
+      } else {
+        pair.push(part);
+      }
+    }
+    if (pair.length >= 2) specs.push({ label: pair[0], value: pair[1] });
+  }
+
   return (
     item.inStock && (
       <div
@@ -77,7 +93,7 @@ const ProductCard = ({ item }) => {
           scrollTo(0, 0);
         }}
         className="
-        group relative flex flex-col cursor-pointer
+        group relative flex flex-col h-full cursor-pointer
         rounded-xl overflow-hidden
         border border-[#E8D8C0]
         bg-[#FAF6EE]
@@ -87,10 +103,11 @@ const ProductCard = ({ item }) => {
       "
       >
         {/* ── IMAGE ── */}
-        <div className="relative w-full h-30 md:h-50 overflow-hidden bg-[#EDE3CC] shrink-0">
+        <div className="relative w-full aspect-4/3 overflow-hidden bg-[#EDE3CC] shrink-0">
           <img
             src={item.image[0]}
             alt={item.name}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             style={{ filter: "saturate(1.06) brightness(1.02)" }}
           />
@@ -101,7 +118,7 @@ const ProductCard = ({ item }) => {
           {/* Single badge — tag OR discount, tag takes priority */}
           {item.tag ? (
             <span
-              className={`absolute top-1.5 right-1.5 flex items-center gap-1 text-[9.5px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm ${badgeBg}`}
+              className={`absolute top-1.5 left-1.5 flex items-center gap-1 text-[9.5px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm ${badgeBg}`}
             >
               <span
                 className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`}
@@ -112,16 +129,28 @@ const ProductCard = ({ item }) => {
               )}
             </span>
           ) : discount ? (
-            <span className="absolute top-1.5 right-1.5 text-[9.5px] font-extrabold px-2 py-0.5 rounded-full bg-[#B73228]/90 text-[#FDF6EC]">
+            <span className="absolute top-1.5 left-1.5 text-[9.5px] font-extrabold px-2 py-0.5 rounded-full bg-[#B73228]/90 text-[#FDF6EC]">
               {discount}%
             </span>
           ) : null}
+
+          {/* Rating badge — top-left, only when reviews exist */}
+          {summary?.total > 0 && (
+            <span className="absolute top-1.5 right-1.5 flex items-center gap-0.5 text-[9.5px] font-bold px-1.5 py-0.5 rounded-full bg-black/55 text-[#FDF6EC] backdrop-blur-sm">
+              <Star
+                size={9}
+                strokeWidth={0}
+                className="fill-amber-400 text-amber-400"
+              />
+              {summary.average} ({summary.total})
+            </span>
+          )}
         </div>
 
         {/* ── BODY ── */}
-        <div className="flex flex-col gap-1.5 px-2.5 pt-2 pb-2.5">
-          {/* Title — max 2 lines */}
-          <p className="text-[12.5px] font-bold text-[#2A1408] leading-snug line-clamp-2 font-serif">
+        <div className="flex flex-col flex-1 gap-1.5 px-2.5 pt-2 pb-2.5">
+          {/* Title — max 2 lines, fixed height so short/long names align */}
+          <p className="text-[12.5px] font-bold text-[#2A1408] leading-snug line-clamp-2 font-serif min-h-[2.4em]">
             {item.name}
           </p>
 
@@ -132,86 +161,95 @@ const ProductCard = ({ item }) => {
             </p>
           )}
 
-          <div className="h-4 flex items-center gap-1">
-            {summary?.total > 0 && (
-              <>
-                <StarRating
-                  value={Math.round(summary.average)}
-                  readonly
-                  size={11}
-                />
-                <span className="text-[10px] text-[#A08060]">
-                  {summary.average} ({summary.total})
+          {/* Spec chips from item.description (e.g. Vegetable, Veg), space always reserved */}
+          <div className="h-4 flex items-center gap-1 overflow-hidden">
+            {specs.length > 0 ? (
+              specs.slice(0, 2).map((spec, i) => (
+                <span
+                  key={i}
+                  className="shrink-0 text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-[#EDE3CC] text-[#7A5C3E] whitespace-nowrap"
+                >
+                  {spec.value}
                 </span>
-              </>
-            )}
-          </div>
-
-          {/* Price row */}
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-[15px] font-extrabold text-[#B73228] leading-none">
-              ₹{item.price}
-            </span>
-            {item.offerPrice === 0 || item.offerPrice === null ? null : (
-              <span className="text-[10px] text-[#B09880] line-through leading-none">
-                ₹{item.offerPrice}
-              </span>
-            )}
-            {item.unit && (
-              <span className="ml-auto text-[9px] text-[#B09880] whitespace-nowrap leading-none">
-                {item.unit}
+              ))
+            ) : (
+              <span className="text-[10px] text-[#A08060] italic">
+                Everyday essential
               </span>
             )}
           </div>
 
-          {/* CTA */}
-          {qty === 0 ? (
-            <button
-              type="button"
-              onClick={handleAdd}
-              onPointerDown={() => setPressed(true)}
-              onPointerUp={() => setPressed(false)}
-              onPointerLeave={() => setPressed(false)}
-              className={`
-              w-full h-9 cursor-pointer flex items-center justify-center gap-1.5
-              rounded-lg text-[11.5px] font-bold text-[#FDF6EC]
-              transition-all duration-150
-              ${pressed ? "scale-95" : "scale-100"}
-              ${added ? "bg-emerald-600" : "bg-[#B73228] active:bg-[#8E2020]"}
-            `}
-            >
-              {!added && (
-                <ShoppingBasket
-                  size={12}
-                  strokeWidth={2.2}
-                  className="hidden md:block"
-                />
+          {/* Price row + circular CTA — pinned to bottom of card */}
+          <div className="flex items-center justify-between gap-1.5 mt-auto pt-0.5">
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-baseline gap-1">
+                <span className="text-[16px] font-extrabold text-[#B73228] leading-none">
+                  ₹{item.price}
+                </span>
+                {item.offerPrice === 0 || item.offerPrice === null ? null : (
+                  <span className="text-[10px] text-[#B09880] line-through leading-none">
+                    ₹{item.offerPrice}
+                  </span>
+                )}
+              </div>
+              {item.unit && (
+                <span className="text-[9px] text-[#B09880] whitespace-nowrap leading-none mt-1">
+                  {item.unit}
+                </span>
               )}
-              <span className="whitespace-nowrap">
-                {added ? "Added" : "Add to Basket"}
-              </span>
-            </button>
-          ) : (
-            <div className="w-full h-9 flex items-center rounded-lg overflow-hidden border border-[#B73228]">
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="w-6 md:w-10 cursor-pointer h-full flex items-center justify-center bg-[#B73228] text-[#FDF6EC] shrink-0 active:bg-[#8E2020] transition-colors"
-              >
-                <Minus size={12} strokeWidth={2.5} />
-              </button>
-              <span className="flex-1 text-center text-sm font-extrabold text-[#B73228]">
-                {qty}
-              </span>
+            </div>
+
+            {/* CTA */}
+            {qty === 0 ? (
               <button
                 type="button"
                 onClick={handleAdd}
-                className="w-6 md:w-10 cursor-pointer h-full flex items-center justify-center bg-[#B73228] text-[#FDF6EC] shrink-0 active:bg-[#8E2020] transition-colors"
+                onPointerDown={() => setPressed(true)}
+                onPointerUp={() => setPressed(false)}
+                onPointerLeave={() => setPressed(false)}
+                className={`
+                shrink-0 w-9 h-9 cursor-pointer flex items-center justify-center
+                rounded-full transition-all duration-150
+                ${pressed ? "scale-90" : "scale-100"}
+                ${added ? "bg-emerald-600" : "bg-[#B73228] active:bg-[#8E2020]"}
+              `}
               >
-                <Plus size={12} strokeWidth={2.5} />
+                {added ? (
+                  <Plus
+                    size={15}
+                    strokeWidth={2.6}
+                    className="text-[#FDF6EC]"
+                  />
+                ) : (
+                  <ShoppingBasket
+                    size={15}
+                    strokeWidth={2.3}
+                    className="text-[#FDF6EC]"
+                  />
+                )}
               </button>
-            </div>
-          )}
+            ) : (
+              <div className="shrink-0 flex items-center rounded-full overflow-hidden border border-[#B73228]">
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="w-7 h-9 cursor-pointer flex items-center justify-center bg-[#B73228] text-[#FDF6EC] active:bg-[#8E2020] transition-colors"
+                >
+                  <Minus size={12} strokeWidth={2.5} />
+                </button>
+                <span className="w-6 text-center text-[12px] font-extrabold text-[#B73228] bg-[#FAF6EE]">
+                  {qty}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  className="w-7 h-9 cursor-pointer flex items-center justify-center bg-[#B73228] text-[#FDF6EC] active:bg-[#8E2020] transition-colors"
+                >
+                  <Plus size={12} strokeWidth={2.5} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )

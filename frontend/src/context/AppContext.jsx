@@ -49,7 +49,6 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/admin/is-auth", {
         withCredentials: true,
       });
-      console.log("admin auth check:", data);
       if (data.success) setIsAdmin(true);
       else setIsAdmin(false); // ← explicitly set false on failure
     } catch {
