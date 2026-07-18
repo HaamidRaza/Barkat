@@ -89,25 +89,26 @@ const Basket = () => {
       });
 
       try {
-        await toast.promise(
-          orderPromise,
-          {
-            loading: "Processing order...",
-            success: (response) => {
-              const { data } = response;
-              if (data.success) {
-                setCartItems({});
-                setTimeout(() => navigate("/orders"), 500);
-                return data.message || "Order placed successfully!";
-              } else {
-                throw new Error(data.message || "Order failed");
-              }
-            },
-            error: (err) => {
-              return err.response?.data?.message || err.message || "Failed to place order";
-            },
-          }
-        );
+        await toast.promise(orderPromise, {
+          loading: "Processing order...",
+          success: (response) => {
+            const { data } = response;
+            if (data.success) {
+              setCartItems({});
+              setTimeout(() => navigate("/orders"), 500);
+              return data.message || "Order placed successfully!";
+            } else {
+              throw new Error(data.message || "Order failed");
+            }
+          },
+          error: (err) => {
+            return (
+              err.response?.data?.message ||
+              err.message ||
+              "Failed to place order"
+            );
+          },
+        });
       } catch (error) {
         console.error(error);
       }
@@ -144,25 +145,28 @@ const Basket = () => {
             });
 
             try {
-              await toast.promise(
-                verifyPromise,
-                {
-                  loading: "Verifying payment...",
-                  success: (verifyResponse) => {
-                    const { data: verifyData } = verifyResponse;
-                    if (verifyData.success) {
-                      setCartItems({});
-                      setTimeout(() => navigate("/orders"), 500);
-                      return verifyData.message || "Payment successful!";
-                    } else {
-                      throw new Error(verifyData.message || "Payment verification failed");
-                    }
-                  },
-                  error: (err) => {
-                    return err.response?.data?.message || err.message || "Payment verification failed";
-                  },
-                }
-              );
+              await toast.promise(verifyPromise, {
+                loading: "Verifying payment...",
+                success: (verifyResponse) => {
+                  const { data: verifyData } = verifyResponse;
+                  if (verifyData.success) {
+                    setCartItems({});
+                    setTimeout(() => navigate("/orders"), 500);
+                    return verifyData.message || "Payment successful!";
+                  } else {
+                    throw new Error(
+                      verifyData.message || "Payment verification failed",
+                    );
+                  }
+                },
+                error: (err) => {
+                  return (
+                    err.response?.data?.message ||
+                    err.message ||
+                    "Payment verification failed"
+                  );
+                },
+              });
             } catch (error) {
               console.error(error);
             }
@@ -297,35 +301,35 @@ const Basket = () => {
                 </div>
 
                 {/* Qty + Delete in same row */}
-                <div className="flex items-center justify-around gap-2 mt-1.5">
-                  <div className="flex items-center rounded-lg overflow-hidden border border-[#D8C9B4] h-8">
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center h-8 rounded-full bg-[#F6F1E7] border border-[#D8C9B4] px-0.5 gap-0.5">
                     <button
                       onClick={() => {
                         if (item.qty === 1) clearCart(item.id || item._id);
                         else updateCartItem(item.id || item._id, item.qty - 1);
                       }}
-                      className="w-8 h-8 flex items-center justify-center bg-[#F6F1E7] active:bg-primary active:text-[#F6F1E7] text-[#7A6A5A] transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded-full text-primary active:bg-[#E2D0B8] active:scale-90 transition-all"
                     >
-                      <Minus size={11} />
+                      <Minus size={13} />
                     </button>
-                    <span className="w-8 text-center text-sm font-bold text-[#2A1A1A]">
+                    <span className="w-6 text-center text-sm font-bold text-[#2A1A1A] tabular-nums">
                       {item.qty}
                     </span>
                     <button
                       onClick={() =>
                         updateCartItem(item.id || item._id, item.qty + 1)
                       }
-                      className="w-8 h-8 flex items-center justify-center bg-[#F6F1E7] active:bg-primary active:text-[#F6F1E7] text-[#7A6A5A] transition-colors"
+                      className="w-7 h-7 flex items-center justify-center rounded-full bg-primary text-[#F6F1E7] active:bg-[#8E2020] active:scale-90 transition-all"
                     >
-                      <Plus size={11} />
+                      <Plus size={13} />
                     </button>
                   </div>
 
                   <button
                     onClick={() => clearCart(item._id)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#C0A090] active:text-red-600 active:bg-red-50 transition-colors"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-red-400 active:text-red-600 active:bg-red-50 transition-colors"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </div>
@@ -335,11 +339,13 @@ const Basket = () => {
 
         {/* Free delivery nudge */}
         {shipping > 0 && (
-          <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5">
-            <Truck size={14} className="text-amber-600 shrink-0" />
-            <p className="text-[12px] text-amber-800 leading-snug">
-              Add <span className="font-bold">₹{499 - subtotal}</span> more for{" "}
-              <span className="font-bold text-green-700">free delivery</span>
+          <div className="flex items-center gap-2.5 bg-[#FBF3E4] border border-[#E8D2A6] rounded-xl px-3.5 py-2.5">
+            <Truck size={14} className="text-primary-alt shrink-0" />
+            <p className="text-[12px] text-[#7A5C3E] leading-snug">
+              Add{" "}
+              <span className="font-bold text-primary">₹{499 - subtotal}</span>{" "}
+              more for{" "}
+              <span className="font-bold text-[#3F7D3A]">free delivery</span>
             </p>
           </div>
         )}
@@ -501,82 +507,89 @@ const Basket = () => {
             return (
               <div
                 key={item.id || item._id}
-                className="flex items-center gap-4 bg-[#EDE6D6] border border-[#D8C9B4] rounded-2xl p-4 hover:border-primary-alt transition-all"
+                className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-6 bg-[#EDE6D6] border border-[#D8C9B4] rounded-2xl p-4 hover:border-primary-alt transition-all"
                 style={{ boxShadow: "0 1px 6px rgba(90,62,43,0.07)" }}
               >
-                <div
-                  onClick={() => {
-                    navigate(
-                      `/products/${item.category.toLowerCase()}/${item._id}`,
-                    );
-                  }}
-                  className="w-24 h-24 cursor-pointer rounded-xl overflow-hidden bg-[#F6F1E7] border border-[#D8C9B4] shrink-0"
-                >
-                  <img
-                    src={Array.isArray(item.image) ? item.image[0] : item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 flex flex-col gap-1 min-w-0">
-                  <p
+                <div className="flex items-center gap-4 min-w-0">
+                  <div
                     onClick={() => {
                       navigate(
                         `/products/${item.category.toLowerCase()}/${item._id}`,
                       );
                     }}
-                    className="font-['Playfair_Display'] cursor-pointer hover:text-primary text-base font-bold text-[#2A1A1A] truncate"
+                    className="w-20 h-20 cursor-pointer rounded-xl overflow-hidden bg-[#F6F1E7] border border-[#D8C9B4] shrink-0"
                   >
-                    {item.name}
-                  </p>
-                  {item.subtitle && (
-                    <p className="text-xs text-[#7A6A5A] truncate">
-                      {item.subtitle}
+                    <img
+                      src={
+                        Array.isArray(item.image) ? item.image[0] : item.image
+                      }
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <p
+                      onClick={() => {
+                        navigate(
+                          `/products/${item.category.toLowerCase()}/${item._id}`,
+                        );
+                      }}
+                      className="font-['Playfair_Display'] cursor-pointer hover:text-primary text-base font-bold text-[#2A1A1A] truncate"
+                    >
+                      {item.name}
                     </p>
-                  )}
-                  <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <span className="text-sm font-bold text-primary">
-                      ₹{price}
-                    </span>
-                    {original && (
-                      <span className="text-xs text-[#9A8A7A] line-through">
-                        ₹{original}
-                      </span>
+                    {item.subtitle && (
+                      <p className="text-xs text-[#7A6A5A] truncate">
+                        {item.subtitle}
+                      </p>
                     )}
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-sm font-bold text-primary">
+                        ₹{price}
+                      </span>
+                      {original && (
+                        <span className="text-xs text-[#9A8A7A] line-through">
+                          ₹{original}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center rounded-xl overflow-hidden border border-[#D8C9B4] shrink-0">
+
+                <div className="flex items-center h-8 rounded-full bg-[#F6F1E7] border border-[#D8C9B4] px-0.5 gap-0.5 w-24 justify-self-center">
                   <button
                     onClick={() => {
                       updateCartItem(item.id || item._id, item.qty - 1);
                       if (item.qty === 1) removeFromCart(item.id || item._id);
                     }}
-                    className="flex items-center justify-center cursor-pointer w-8 h-8 bg-[#F6F1E7] hover:bg-primary hover:text-[#F6F1E7] text-[#7A6A5A] transition-all"
+                    className="flex-1 h-7 flex items-center justify-center cursor-pointer rounded-full text-primary active:bg-[#E2D0B8] transition-colors"
                   >
-                    <Minus size={11} />
+                    <Minus size={12} />
                   </button>
-                  <span className="w-8 text-center text-sm font-bold text-[#2A1A1A]">
+                  <span className="w-6 text-center text-sm font-bold text-[#2A1A1A] tabular-nums">
                     {item.qty}
                   </span>
                   <button
                     onClick={() =>
                       updateCartItem(item.id || item._id, item.qty + 1)
                     }
-                    className="flex items-center justify-center cursor-pointer w-8 h-8 bg-[#F6F1E7] hover:bg-primary hover:text-[#F6F1E7] text-[#7A6A5A] transition-all"
+                    className="flex-1 h-7 flex items-center justify-center cursor-pointer rounded-full bg-primary text-[#F6F1E7] active:bg-[#8E2020] transition-colors"
                   >
-                    <Plus size={11} />
+                    <Plus size={12} />
                   </button>
                 </div>
+
                 <div className="w-20 text-right shrink-0">
                   <span className="text-sm font-bold text-[#2A1A1A]">
                     ₹{price * item.qty}
                   </span>
                 </div>
+
                 <button
                   onClick={() => clearCart(item._id)}
-                  className="w-8 h-8 rounded-lg hover:bg-[#FDF0EE] cursor-pointer text-[#B0A090] hover:text-red-600 transition-all shrink-0 flex items-center justify-center"
+                  className="w-9 h-9 rounded-full hover:bg-[#FDF0EE] cursor-pointer text-[#B0A090] hover:text-red-600 transition-all shrink-0 flex items-center justify-center"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={15} />
                 </button>
               </div>
             );
@@ -798,45 +811,43 @@ const Basket = () => {
 
       {/* ── Sticky bottom order bar (mobile only) ── */}
       <div
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#FAF6EE] border-t border-[#E2D0B8] px-4 pb-5"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#FAF6EE] border-t border-[#E2D0B8] px-4 pt-3 pb-5"
         style={{ boxShadow: "0 -4px 20px rgba(90,52,26,0.10)" }}
       >
-        {/* Summary row */}
-        <div className="flex flex-col items-center justify-between mb-2.5">
-          <div className="w-full my-2">
-            <span className="flex justify-around text-[10px] text-[#9A8A7A] uppercase tracking-wide font-semibold">
-              <span>{getCartCount()} items</span>
-              <span
-                className={`text-md font-bold ${shipping === 0 ? "text-[#3F7D3A]" : "text-[#5A3E2B]"}`}
-              >
-                {shipping === 0 ? "Free delivery" : `+₹${shipping} delivery`}
-              </span>
+        {/* Meta row */}
+        <div className="flex items-center justify-between text-[10.5px] text-[#9A8A7A] font-semibold uppercase tracking-wide mb-2 px-0.5">
+          <span>
+            {getCartCount()} item{getCartCount() !== 1 ? "s" : ""}
+          </span>
+          <span className={shipping === 0 ? "text-[#3F7D3A]" : ""}>
+            {shipping === 0 ? "Free delivery" : `+₹${shipping} delivery`}
+          </span>
+        </div>
+
+        {/* Price + CTA row */}
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col leading-tight shrink-0">
+            <span className="font-['Playfair_Display'] text-2xl font-extrabold text-primary">
+              ₹{total}
             </span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex flex-col">
-              <span className="font-['Playfair_Display'] text-xl font-extrabold text-primary">
-                ₹{total}
+            {tax > 0 && (
+              <span className="text-[10px] text-[#9A8A7A]">
+                incl. ₹{tax} tax
               </span>
-              {tax > 0 && (
-                <span className="text-[10px] text-[#9A8A7A]">
-                  incl. ₹{tax} tax
-                </span>
-              )}
-            </div>
-            <button
-              onClick={placeOrder}
-              className="flex items-center gap-2 px-2 py-4 bg-primary active:bg-[#8E2020] active:scale-95 transition-all text-[#F6F1E7] text-sm font-bold rounded-xl"
-              style={{ boxShadow: "0 3px 12px rgba(183,50,40,0.30)" }}
-            >
-              <ShoppingBasket size={14} />
-              {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
-            </button>
+            )}
           </div>
+          <button
+            onClick={placeOrder}
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary active:bg-[#8E2020] active:scale-[0.97] transition-all text-[#F6F1E7] text-sm font-bold rounded-2xl"
+            style={{ boxShadow: "0 3px 12px rgba(183,50,40,0.30)" }}
+          >
+            <ShoppingBasket size={15} />
+            {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
+          </button>
         </div>
 
         {/* Trust pills */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 mt-2.5">
           {[
             { icon: <ShieldCheck size={10} />, label: "Secure" },
             { icon: <Truck size={10} />, label: "Fast delivery" },

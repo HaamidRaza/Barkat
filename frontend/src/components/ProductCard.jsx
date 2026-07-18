@@ -229,23 +229,23 @@ const ProductCard = ({ item }) => {
                 )}
               </button>
             ) : (
-              <div className="shrink-0 flex items-center rounded-full overflow-hidden border border-[#B73228]">
+              <div className="shrink-0 flex items-center h-7 rounded-full bg-[#FDF6EC] border border-[#E0C9A6] px-0.5 gap-0.5">
                 <button
                   type="button"
                   onClick={handleRemove}
-                  className="w-7 h-9 cursor-pointer flex items-center justify-center bg-[#B73228] text-[#FDF6EC] active:bg-[#8E2020] transition-colors"
+                  className="w-6 h-6 cursor-pointer flex items-center justify-center rounded-full text-[#B73228] hover:bg-[#F3E4CE] active:scale-90 transition-all"
                 >
-                  <Minus size={12} strokeWidth={2.5} />
+                  <Minus size={13} strokeWidth={2.5} />
                 </button>
-                <span className="w-6 text-center text-[12px] font-extrabold text-[#B73228] bg-[#FAF6EE]">
+                <span className="w-4 text-center text-[12px] font-bold text-[#2A1408] tabular-nums">
                   {qty}
                 </span>
                 <button
                   type="button"
                   onClick={handleAdd}
-                  className="w-7 h-9 cursor-pointer flex items-center justify-center bg-[#B73228] text-[#FDF6EC] active:bg-[#8E2020] transition-colors"
+                  className="w-6 h-6 cursor-pointer flex items-center justify-center rounded-full bg-[#B73228] text-[#FDF6EC] active:bg-[#8E2020] active:scale-90 transition-all"
                 >
-                  <Plus size={12} strokeWidth={2.5} />
+                  <Plus size={13} strokeWidth={2.5} />
                 </button>
               </div>
             )}
